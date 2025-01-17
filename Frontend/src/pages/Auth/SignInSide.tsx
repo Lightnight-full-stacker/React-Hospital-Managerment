@@ -18,7 +18,7 @@ import HeartRateLoader from "../../components/HeartRateLoader";
 import { useForm } from "react-hook-form";
 
 type FormValues = {
-  email: string;
+  username: string;
   password: string;
 };
 
@@ -108,30 +108,23 @@ export default function SignInSide() {
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <TextField
                     margin="normal"
-                    //required
+                    required
                     fullWidth
-                    id="email"
-                    label="Email Address"
-                    //name="email"
-                    //autoComplete="email"
-                    //autoFocus
-                    value="test@test.com"
-                    {...register("email", {
-                      required: "Email is required"
+                    id="username"
+                    label="User Name"
+                    {...register("username", {
+                      required: "Username is required"
                     })}
-                    error={!!errors.email}
-                    helperText={errors.email?.message}
+                    error={!!errors.username}
+                    helperText={errors.username?.message}
                   />
                   <TextField
                     margin="normal"
-                    //required
+                    required
                     fullWidth
-                    //name="password"
                     label="Password"
                     type={showPassword ? "text" : "password"}
                     id="password"
-                    value="1234"
-                    //autoComplete="current-password"
                     {...register("password", {
                       required: "Password is required"
                     })}
