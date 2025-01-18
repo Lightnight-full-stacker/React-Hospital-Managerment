@@ -177,34 +177,7 @@ export default function SignInSide() {
                 </Grid>
                 <Divider sx={{ mt: 2 }} light variant="middle">
                   OR
-                </Divider>
-                <Button
-                  fullWidth
-                  startIcon={<GoogleIcon />}
-                  variant="outlined"
-                  sx={{
-                    mt: 2
-                  }}
-                >
-                  Continue with google
-                </Button>
-
-                <Button
-                  fullWidth
-                  startIcon={<FacebookIcon />}
-                  variant="outlined"
-                  sx={{
-                    mt: 2
-                  }}
-                >
-                  Continue with facebook
-                </Button>
-
-                <Typography align="center" variant="subtitle2" sx={{ mt: 2 }}>
-                  By continuing, you agree to{" "}
-                  <span style={{ color: "green" }}>Terms of Service</span> and
-                  <span style={{ color: "green" }}> Privacy Policy</span>.
-                </Typography>
+                </Divider>                
               </Box>
             </Box>
           </Grid>
