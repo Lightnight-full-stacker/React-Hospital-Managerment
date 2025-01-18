@@ -20,6 +20,8 @@ import BookOnlineIcon from "@mui/icons-material/BookOnline";
 import SickIcon from "@mui/icons-material/Sick";
 import ViewKanbanIcon from "@mui/icons-material/ViewKanban";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+
 
 const primarynavList = [
   {
@@ -27,35 +29,31 @@ const primarynavList = [
     label: "Dashboard",
     icon: <DashboardIcon />,
   },
-  // {
-    //   link: "/profile",
-    //   label: "Doctor Profile",
-    //   icon: <AccountCircleIcon />,
-    // },
-    {
-      link: "/doctor-list",
-      label: "Admin",
-      icon: <PeopleIcon />,
-    },
-    {
-      link: "/patient-list",
-      label: "Patient List",
-      icon: <SickIcon />,
-    },
-    {
-      link: "/search",
-      label: "Search",
-      icon: <SearchSharpIcon />,
-    },
-    // {
-    //   link: "/account",
-    //   label: "Account",
-    //   icon: <ManageAccountsIcon />,
-    // },
   {
-      link: "/appointments",
-      label: "Appointments",
-      icon: <BookOnlineIcon />,
+    link: "/profile",
+    label: "Doctor Profile",
+    icon: <AccountCircleIcon />,
+  },
+  {
+    link: "/administrator",
+    label: "administrator",
+    icon: <AdminPanelSettingsIcon/>,
+  },
+/*  {
+    link: "/doctor-list",
+    label: "Doctor List",
+    icon: <PeopleIcon />,
+  },
+*/
+  {
+    link: "/patient-list",
+    label: "Patient List",
+    icon: <SickIcon />,
+  },
+  {
+    link: "/appointments",
+    label: "Appointments",
+    icon: <BookOnlineIcon />,
   },
   {
     link: "/calender",
@@ -63,41 +61,50 @@ const primarynavList = [
     icon: <CalendarMonthIcon />,
   },
   {
-    // link: "/kanban",
-    // label: "Kanban",
-    // icon: <ViewKanbanIcon />,
+    link: "/kanban",
+    label: "Kanban",
+    icon: <ViewKanbanIcon />,
+  },
+  {
+    link: "/account",
+    label: "Account",
+    icon: <ManageAccountsIcon />,
   },
 ];
 
 const secondaryNavList = [
   {
-    //link: "/lab-results",
+    link: "/lab-results",
     label: "Lab Results",
     icon: <ReceiptLongIcon />,
   },
   {
-    //link: "/medical-records",
+    link: "/medical-records",
     label: "Medical Records",
     icon: <DescriptionIcon />,
   },
   {
-    //link: "/prescriptions",
+    link: "/prescriptions",
     label: "Prescriptions",
     icon: <AssignmentTurnedInIcon />,
   },
   {
-    //link: "/plans",
+    link: "/plans",
     label: "Care Plans",
     icon: <AssignmentIcon />,
   },
   {
-    //link: "/forms",
+    link: "/forms",
     label: "Forms",
     icon: <DescriptionIcon />,
   },
-  
   {
-    //link: "/help",
+    link: "/search",
+    label: "Search",
+    icon: <SearchSharpIcon />,
+  },
+  {
+    link: "/help",
     label: "Get Help",
     icon: <HelpIcon />,
   },
@@ -141,7 +148,7 @@ export const secondaryListItems = (
         to={data.link}
         style={{ textDecoration: "none", color: "inherit" }}
       >
-        <ListItemButton disabled>
+        <ListItemButton>
           <ListItemIcon>{data.icon}</ListItemIcon>
           <ListItemText primary={data.label} />
         </ListItemButton>

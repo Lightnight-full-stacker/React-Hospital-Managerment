@@ -126,7 +126,7 @@ export default function Appbar_Patient(props: { appBarTitle: string; id: Number 
         <Toolbar sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: [1] }}>
           <Typography variant="h4" align="center">
             {/* alt="logo" */}
-            <img src="hospital.svg" height="40px"  />
+            <img src="/hospital.svg" height="40px"  alt="logo"/>
             <span style={{ color: "#005B93" }}>EALTHY</span>
           </Typography>
           <IconButton onClick={toggleDrawer}>
