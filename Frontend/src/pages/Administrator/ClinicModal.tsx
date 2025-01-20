@@ -30,7 +30,8 @@ import {
     Modal,
     Radio,
     RadioGroup,
-    FormLabel
+    FormLabel,
+    ModalProps
   } from "@mui/material";
 import Appbar from "../../components/Appbar";
 import { GridOff } from "@mui/icons-material";
@@ -61,118 +62,123 @@ const ALL_TIMES = [
     "11:00 PM",
   ];
 
+  interface Clinic {
+    clinicName: string,
+    subTitle: string,
+    address1: string,
+    address2: string,
+    city: string,
+    postCode: string,
+    country: string,
+    state: string,
+    telephoneNumber1: string,
+    telephoneNumber2: string,
+    fax: string,
+    email: string,
+    id1: string,
+    id2: string,
+    type1: string,
+    type2: string,
+    specialization: string,
+    slotDuration: number,
+    bookingStartTime: string,
+    bookingEndTime: string,
+}
+
+
+interface ClinicModalProps {
+    clinic1: Clinic;
+    updateClinic: (updatedClinic: Clinic) => void;
+}
+
 
   
-const ClinicModal = () => {
+const ClinicModal: React.FC<ClinicModalProps> = ({ clinic1, updateClinic }:ClinicModalProps) => {
 
-    interface Clinic {
-        clinicName: string,
-        subTitle: string,
-        address1: string,
-        address2: string,
-        city: string,
-        postCode: string,
-        country: string,
-        state: string,
-        telephoneNumber1: string,
-        telephoneNumber2: string,
-        fax: string,
-        email: string,
-        id1: string,
-        id2: string,
-        type1: string,
-        type2: string,
-        specialization: string,
-        slotDuration: string,
-        bookingStartTime: string,
-        bookingEndTime: string,
-    }
+    
+    
 
-    const [clinic, setClinic] = useState<Clinic>({clinicName:'', subTitle:'', address1:'', address2:'', city:'', postCode:'', country:'', state:'', telephoneNumber1:'', telephoneNumber2:'', fax:'', email:'', id1:'', id2:'',type1:'', type2:'', specialization:'', slotDuration:'', bookingStartTime:'', bookingEndTime:''});
+    const [clinic, setClinic] = useState<Clinic>(clinic1);
+
     
     const handleClinicChange = (e: React.ChangeEvent<HTMLInputElement |  HTMLTextAreaElement> | SelectChangeEvent) => {
         const { name, value } = e.target;
-        if (name === 'id1') {
-            setClinic((prev) => ({
-              ...prev,
-              id1: value as string,
-            }));
-          } else if (name ==='id2') {
-            setClinic((prev) => ({
-                ...prev,
-                id2: value as string,
-              }));
-          } else if (name === 'slotDuration') {
-            setClinic((prev) => ({
-                ...prev,
-                slotDuration: value as string,
-              }));
-          }
+        const updatedClinic = { ...clinic, [name]: value };
+        setClinic(updatedClinic);
+    
     }
 
 
-    const [slotDuration, setSlotDuration] = useState<number>(15); // Default slot duration in minutes
-    const [bookingStartTime, setBookingStartTime] = useState<string>("");
-    const [bookingEndTime, setBookingEndTime] = useState<string>("");
     const [filteredBookingStartTimes, setFilteredBookingStartTimes] = useState<string[]>([]);
     const [filteredBookingEndTimes, setFilteredBookingEndTimes] = useState<string[]>([]);
 
     const generateTimeSlots = (start: string, end: string, duration: number) => {
-        const startTime = new Date(`1970-01-01T${start.replace(" AM", "").replace(" PM", "")}:00`);
-        const endTime = new Date(`1970-01-01T${end.replace(" AM", "").replace(" PM", "")}:00`);
-        const slots: string[] = [];
-      
-        while (startTime < endTime) {
-          const hours = startTime.getHours();
-          const minutes = startTime.getMinutes();
-          const ampm = hours >= 12 ? "PM" : "AM";
-          const formattedTime = `${(hours % 12 || 12).toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${ampm}`;
-          slots.push(formattedTime);
-      
-          startTime.setMinutes(startTime.getMinutes() + duration);
-        }
-      
-        return slots;
+    const startTime = new Date(`1970-01-01T${start.replace(" AM", "").replace(" PM", "")}:00`);
+    const endTime = new Date(`1970-01-01T${end.replace(" AM", "").replace(" PM", "")}:00`);
+    const slots: string[] = [];
+
+    while (startTime < endTime) {
+      const hours = startTime.getHours();
+      const minutes = startTime.getMinutes();
+      const ampm = hours >= 12 ? "PM" : "AM";
+      const formattedTime = `${(hours % 12 || 12).toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+      slots.push(formattedTime);
+
+      startTime.setMinutes(startTime.getMinutes() + duration);
+    }
+
+    return slots;
+  };
+
+  const handleSlotDurationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const duration = parseInt(event.target.value, 10);
+    const updatedClinic = {
+        ...clinic,
+        slotDuration: duration,
+        bookingStartTime: '',
+        bookingEndTime: '',
       };
-      
-      // Update available start times when slot duration changes
-      const handleSlotDurationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const duration = parseInt(event.target.value, 10);
-        setSlotDuration(duration);
-        const startTimes = generateTimeSlots("07:00 AM", "11:00 PM", duration);
-        setFilteredBookingStartTimes(startTimes);
-        setFilteredBookingEndTimes([]); // Reset end times
-        setBookingStartTime(""); // Reset start time
-        setBookingEndTime(""); // Reset end time
+      setClinic(updatedClinic);
+    const startTimes = generateTimeSlots("07:00 AM", "11:00 PM", duration);
+    setFilteredBookingStartTimes(startTimes);
+    setFilteredBookingEndTimes([]);
+  };
+
+  const handleBookingStartTimeChange = (event: SelectChangeEvent<string>) => {
+    const selectedStartTime = event.target.value as string;
+    setClinic((prevState) => ({
+      ...prevState,
+      bookingStartTime: selectedStartTime,
+      bookingEndTime: "",
+    }));
+
+    const selectedStartTimestamp = new Date(`1970-01-01T${selectedStartTime.replace(" AM", "").replace(" PM", "")}:00`).getTime();
+    const filteredEndTimes = ALL_TIMES.filter((time) => {
+      const endTimestamp = new Date(`1970-01-01T${time.replace(" AM", "").replace(" PM", "")}:00`).getTime();
+      return (
+        endTimestamp > selectedStartTimestamp &&
+        (endTimestamp - selectedStartTimestamp) % (clinic.slotDuration * 60 * 1000) === 0
+      );
+    });
+        const updatedClinic = {
+        ...clinic,
+        bookingStartTime: selectedStartTime,
+        bookingEndTime: '',
       };
-      
-      // Update end times when start time changes
-      const handleBookingStartTimeChange = (event: SelectChangeEvent) => {
-        const selectedStartTime = event.target.value;
-        setBookingStartTime(selectedStartTime);
-        
-        // Convert start time to timestamp
-        const selectedStartTimestamp = new Date(`1970-01-01T${selectedStartTime.replace(' AM', '').replace(' PM', '')}:00`).getTime();
-      
-        // Filter potential end times from the ALL_TIMES array (or any array of times you're using)
-        const filteredEndTimes = ALL_TIMES.filter((time) => {
-          // Convert end time to timestamp
-          const endTimestamp = new Date(`1970-01-01T${time.replace(' AM', '').replace(' PM', '')}:00`).getTime();
-          
-          // Ensure the end time is after the start time and the time difference is a multiple of slot duration
-          return endTimestamp > selectedStartTimestamp && (endTimestamp - selectedStartTimestamp) % (slotDuration * 60 * 1000) === 0;
-        });
-      
-        // Update filtered end times based on start time selection
-        setFilteredBookingEndTimes(filteredEndTimes);
-        setBookingEndTime(""); // Reset end time if start time changes
-      };
-      
-      
-      // Update selected end time
-      const handleBookingEndTimeChange = (event: SelectChangeEvent) => {
-        setBookingEndTime(event.target.value);
-      };
+    setFilteredBookingEndTimes(filteredEndTimes);
+
+
+  };
+
+  const handleBookingEndTimeChange = (event: SelectChangeEvent<string>) => {
+    const updatedClinic = { ...clinic, bookingEndTime: event.target.value };
+    setClinic(updatedClinic);
+  };
+    const handleSaveChange = ():void => {
+        updateClinic(clinic);
+        setOpen(false);
+        console.log("Clinic Data", clinic);
+    }
       
     const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
@@ -225,7 +231,6 @@ const ClinicModal = () => {
                                     <div className="clinic" style={styles.container}>
                                         <h2>Clinic</h2>
                                         <div className="clinc-name" style={styles.container}>
-                                            <Checkbox/>
                                             <label>Clinic Name:</label>
                                             <Grid item xs={12}>
                                                 <TextField 
@@ -240,7 +245,6 @@ const ClinicModal = () => {
                                             </Grid>   
                                         </div>
                                         <div className="Other Information" style={styles.container}>
-                                            <Checkbox />
                                             <label>Other Information</label>
                                             <Grid container spacing={1}>
                                                 <Grid item xs={12}>
@@ -250,25 +254,33 @@ const ClinicModal = () => {
                                                         fullWidth
                                                         multiline
                                                         variant="standard"
+                                                        value={clinic.subTitle}
+                                                        name="subTitle"
+                                                        onChange={handleClinicChange}
                                                           
                                                     />
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <TextField
-                                                        id="other-information-address"
+                                                        id="other-information-address-3"
                                                         label="Address(line1)"
                                                         fullWidth
                                                         variant="standard"
+                                                        value={clinic.address1}
+                                                        name="address1"
+                                                        onChange={handleClinicChange}
                                                          
                                                     />
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <TextField
-                                                        id="other-information-address"
+                                                        id="other-information-address-4"
                                                         label="Address(line2)"
                                                         fullWidth
                                                         variant="standard"
-                                                         
+                                                        value={clinic.address2}
+                                                        name="address2"
+                                                        onChange={handleClinicChange}
                                                     />
                                                 </Grid>
                                                 <Grid item xs={6}>
@@ -277,6 +289,9 @@ const ClinicModal = () => {
                                                         label="City"
                                                         fullWidth
                                                         variant="standard"
+                                                        value={clinic.city}
+                                                        name="city"
+                                                        onChange={handleClinicChange}
                                                          
                                                     />
                                                 </Grid>
@@ -286,6 +301,9 @@ const ClinicModal = () => {
                                                         label="Post Code"
                                                         fullWidth
                                                         variant="standard"
+                                                        value={clinic.postCode}
+                                                        onChange={handleClinicChange}
+                                                        name="postCode"
                                                          
                                                     />
                                                 </Grid>
@@ -295,6 +313,9 @@ const ClinicModal = () => {
                                                         label="Country"
                                                         fullWidth
                                                         variant="standard"
+                                                        name="country"
+                                                        value={clinic.country}
+                                                        onChange={handleClinicChange}
                                                          
                                                     />
                                                 </Grid>
@@ -304,6 +325,9 @@ const ClinicModal = () => {
                                                         label="State"
                                                         fullWidth
                                                         variant="standard"
+                                                        name="state"
+                                                        value={clinic.state}
+                                                        onChange={handleClinicChange}
                                                          
                                                     />
                                                 </Grid>
@@ -313,6 +337,9 @@ const ClinicModal = () => {
                                                         label="Telephone-1"
                                                         fullWidth
                                                         variant="standard"
+                                                        name="telephoneNumber1"
+                                                        value={clinic.telephoneNumber1}
+                                                        onChange={handleClinicChange}
                                                          
                                                     />
                                                 </Grid>
@@ -322,6 +349,9 @@ const ClinicModal = () => {
                                                         label="Telephone-2"
                                                         fullWidth
                                                         variant="standard"
+                                                        name="telephoneNumber2"
+                                                        value={clinic.telephoneNumber2}
+                                                        onChange={handleClinicChange}
                                                          
                                                     />
                                                 </Grid>
@@ -331,6 +361,9 @@ const ClinicModal = () => {
                                                         label="Fax"
                                                         fullWidth
                                                         variant="standard"
+                                                        name="fax"
+                                                        value={clinic.fax}
+                                                        onChange={handleClinicChange}
                                                          
                                                     />
                                                 </Grid>
@@ -340,6 +373,9 @@ const ClinicModal = () => {
                                                         label="Email"
                                                         fullWidth
                                                         variant="standard"
+                                                        name="email"
+                                                        value={clinic.email}
+                                                        onChange={handleClinicChange}
                                                          
                                                     />
                                                 </Grid>
@@ -351,7 +387,9 @@ const ClinicModal = () => {
                                                             fullWidth
                                                             multiline
                                                             variant="standard"
-                                                             
+                                                            name="type1"
+                                                            value={clinic.type1}
+                                                            onChange={handleClinicChange}
                                                         />
                                                     </Grid>
                                                     <Grid item xs={5} sx={{mt:1}}>
@@ -380,10 +418,12 @@ const ClinicModal = () => {
                                                             fullWidth
                                                             multiline
                                                             variant="standard"
-                                                             
+                                                            name="type2"
+                                                            value={clinic.type2}
+                                                            onChange={handleClinicChange}
                                                         />
                                                     </Grid>
-                                                    <Grid item xs={5} sx={{mt:10}}>
+                                                    <Grid item xs={5} sx={{mt:1}}>
                                                         <FormControl variant="standard" fullWidth>
                                                             <Select
                                                                 id="other-information-id-2"
@@ -407,13 +447,14 @@ const ClinicModal = () => {
                                                         label="Specialization"
                                                         fullWidth
                                                         variant="standard"
-                                                         
+                                                        name="specialization"
+                                                        value={clinic.specialization}
+                                                        onChange={handleClinicChange}
                                                     />
                                                 </Grid>
                                             </Grid>
                                         </div>
                                         <div className="appointment-book" style={styles.container}>
-                                            <Checkbox/>
                                             <label>Appointment Book</label>
                                             <Grid container spacing={1}>
                                                 <Grid item xs={12}>
@@ -423,7 +464,7 @@ const ClinicModal = () => {
                                                             row
                                                             aria-labelledby="appointment-book-slot-duration"
                                                             name="slotDuration"
-                                                            value={slotDuration}
+                                                            value={clinic.slotDuration}
                                                             onChange={handleSlotDurationChange}
                                                         >
                                                             <FormControlLabel value={5} control={<Radio />} label="5 Minutes" />
@@ -438,7 +479,7 @@ const ClinicModal = () => {
                                                         <Select
                                                             id="appointment-book-bookings-start-at"
                                                             
-                                                            value={bookingStartTime}
+                                                            value={clinic.bookingStartTime}
                                                             onChange={handleBookingStartTimeChange}
                                                             >
                                                                 {filteredBookingStartTimes.map((time) => (
@@ -455,8 +496,8 @@ const ClinicModal = () => {
                                                         <InputLabel id="appointment-book-bookings-end-at">Bookings end at</InputLabel>
                                                         <Select
                                                             id="appointment-book-bookings-end-at"
-                                                            disabled={!bookingStartTime}
-                                                            value={bookingEndTime}
+                                                            disabled={!clinic.bookingStartTime}
+                                                            value={clinic.bookingEndTime}
                                                             onChange={handleBookingEndTimeChange}
                                                             >
                                                                 {filteredBookingEndTimes.map((time) => (
@@ -471,7 +512,7 @@ const ClinicModal = () => {
                                             </Grid>
                                         </div>
                                         <Grid item xs={12} sx={{ mt:2, display:'flex', justifyContent:'right'}}>
-                                            <Button variant="contained" color="success" sx={{mr:3}}>
+                                            <Button variant="contained" color="success" sx={{mr:3}} onClick={handleSaveChange}>
                                                 Save
                                             </Button>
                                             <Button variant="outlined" color="success" onClick={handleClose}>
